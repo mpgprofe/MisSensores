@@ -2,12 +2,16 @@ package com.example.missensores;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorListener;
 import android.hardware.SensorManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.widget.TextView;
 
 import java.util.List;
@@ -15,6 +19,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
     TextView textView1, textView2;
     SensorManager sensorManager;
+    Vibrator vibrador;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +46,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         sensorManager.registerListener((SensorEventListener) this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY),
                 sensorManager.SENSOR_DELAY_NORMAL);
+        vibrador = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
+
 
         sensorManager.registerListener((SensorEventListener) this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT),
@@ -54,6 +62,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void onSensorChanged(SensorEvent sensorEvent) {
         if (sensorEvent.sensor.getType() == Sensor.TYPE_PROXIMITY) {
             textView2.setText("Valor: " + sensorEvent.values[0]);
+
+            if ( sensorEvent.values[0]==0) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrador.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
+                } else {
+                    vibrador.vibrate(500);
+                }
+            }
+
+
         }else if (sensorEvent.sensor.getType()==Sensor.TYPE_LIGHT){
             textView1.setText("Luz: "+ sensorEvent.values[0]);
         }
